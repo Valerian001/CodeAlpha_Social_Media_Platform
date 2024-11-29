@@ -1,0 +1,49 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}{{ profile.user.username }}'s Profile{% endblock %}
+
+{% block content %}
+    <h1>{{ profile.user.username }}'s Profile</h1>
+    {% if profile.profile_picture %}
+        <img src="{{ profile.profile_picture.url }}" alt="{{ profile.user.username }}'s profile picture">
+    {% else %}
+        <img src="{% static 'default_profile_picture.jpeg' %}" alt="Default profile picture">
+    {% endif %}
+    <p>Bio: {{ profile.bio }}</p>
+    <p>Followers: {{ profile.followers_count }}</p>
+    <p>Following: {{ profile.following_count }}</p>
+    {% if request.user.is_authenticated and request.user != profile.user %}
+        {% if is_following %}
+            <form action="{% url 'unfollow' username=profile.user.username %}" method="POST">
+                {% csrf_token %}
+                <button type="submit">Unfollow</button>
+            </form>
+        {% else %}
+            <form action="{% url 'follow' username=profile.user.username %}" method="POST">
+                {% csrf_token %}
+                <button type="submit">Follow</button>
+            </form>
+        {% endif %}
+    {% elif request.user == profile.user %}
+        <a href="{% url 'edit_profile' username=profile.user.username %}">Edit Profile</a>
+    {% endif %}
+
+    <h3>Followers</h3>
+    <ul>
+        {% for follower in followers %}
+            <li><a href="{% url 'profile' username=follower.follower.username %}">{{ follower.follower.username }}</a></li>
+        {% empty %}
+            <li>No followers yet.</li>
+        {% endfor %}
+    </ul>
+
+    <h3>Following</h3>
+    <ul>
+        {% for followed in following %}
+            <li><a href="{% url 'profile' username=followed.followed.username %}">{{ followed.followed.username }}</a></li>
+        {% empty %}
+            <li>Not following anyone yet.</li>
+        {% endfor %}
+    </ul>
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Your Feed{% endblock %}
+
+{% block content %}
+{% for post in posts %}
+    <div>
+        <h3>{{ post.user.username }}</h3>
+        <p>{{ post.content }}</p>
+        {% if post.image %}
+            <img src="{{ post.image.url }}" alt="Post image">
+        {% endif %}
+        <p>Posted on: {{ post.created_at }}</p>
+    </div>
+{% empty %}
+    <p>You are not following anyone yet. Start following users to see their posts here.</p>
+{% endfor %}
+{% endblock %}
